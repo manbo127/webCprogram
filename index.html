@@ -3,40 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网页版C程序</title>
+    <title>九队计分系统</title>
     <style>
-        body {
-            font-family: "Courier New", monospace;
-            background-color: #f0f0f0;
-            padding: 20px;
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            background: linear-gradient(135deg,#1e3c72,#2a5298);
+            min-height:100vh;
+            font-family: Arial, sans-serif;
+            color:white;
+            padding:30px;
         }
-        h1 {
-            color: #333;
+        h1{text-align:center;margin-bottom:30px;font-size:48px;letter-spacing:3px;}
+        #modeText{text-align:center;font-size:28px;margin-bottom:30px;font-weight:bold;}
+        .controls{display:flex;justify-content:center;gap:20px;margin-bottom:40px;flex-wrap:wrap;}
+        button{
+            width:120px;height:60px;border:none;border-radius:15px;font-size:24px;font-weight:bold;color:white;cursor:pointer;transition:0.2s;
         }
-        #output {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-top: 10px;
-            min-height: 50px;
-        }
-        button {
-            padding: 5px 10px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
+        button:hover{transform:scale(1.1);}
+        .active{box-shadow:0 0 20px yellow;transform:scale(1.1);}
+        #btn10{background:#27ae60;}
+        #btn20{background:#2980b9;}
+        #btn30{background:#8e44ad;}
+        #btnMinus{background:#c0392b;}
+        #resetBtn{background:#f39c12;}
+        .teams{max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:25px;}
+        .team{background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);border-radius:20px;padding:35px;text-align:center;cursor:pointer;transition:0.2s;border:2px solid rgba(255,255,255,0.2);}
+        .team:hover{transform:translateY(-8px);background:rgba(255,255,255,0.25);}
+        .team-name{font-size:28px;margin-bottom:20px;font-weight:bold;}
+        .score{font-size:60px;font-weight:bold;color:#ffeaa7;}
     </style>
 </head>
 <body>
+    <h1>九队计分系统</h1>
 
-<h1>网页版C程序</h1>
+    <div id="modeText">当前模式：未选择</div>
 
-<p>点击下面按钮运行“程序”：</p>
-<button id="runBtn">运行程序</button>
+    <div class="controls">
+        <button id="btn10">+10</button>
+        <button id="btn20">+20</button>
+        <button id="btn30">+30</button>
+        <button id="btnMinus">-10</button>
+        <button id="resetBtn">清零</button>
+    </div>
 
-<div id="output"></div>
+    <div class="teams" id="teamsContainer"></div>
 
-<script src="script.js"></script>
+    <script>
+        // 九队分数
+        let scores = Array(9).fill(0);
+        let currentMode = 0;
 
+        const teamsContainer = document.getElementById("teamsContainer");
+        const modeText = document.getElementById("modeText");
+
+        const buttons = {
+            btn10: document.getElementById("btn10"),
+            btn20: document.getElementById("btn20"),
+            btn30: document.getElementById("btn30"),
+            btnMinus: document.getElementById("btnMinus")
+        };
+
+        // 设置模式函数
+        function setMode(value,text,buttonId){
+            currentMode = value;
+            modeText.innerText = "当前模式：" + text;
+            // 清除所有高亮
+            Object.values(buttons).forEach(btn=>btn.classList.remove("active"));
+            // 当前按钮高亮
+            document.getElementById(buttonId).classList.add("active");
+        }
+
+        // 按钮事件绑定
+        buttons.btn10.addEventListener("click",()=>setMode(10,"+10","btn10"));
+        buttons.btn20.addEventListener("click",()=>setMode(20,"+20","btn20"));
+        buttons.btn30.addEventListener("click",()=>setMode(30,"+30","btn30"));
+        buttons.btnMinus.addEventListener("click",()=>setMode(-10,"-10","btnMinus"));
+
+        // 创建九队
+        for(let i=0;i<9;i++){
+            const teamDiv = document.createElement("div");
+            teamDiv.className="team";
+            teamDiv.innerHTML=`
+                <div class="team-name">队伍 ${i+1}</div>
+                <div class="score" id="score-${i}">0</div>
+            `;
+            teamDiv.addEventListener("click",()=>{
+                if(currentMode===0){
+                    alert("请先选择加减模式");
+                    return;
+                }
+                scores[i] += currentMode;
+                document.getElementById(`score-${i}`).innerText = scores[i];
+            });
+            teamsContainer.appendChild(teamDiv);
+        }
+
+        // 清零按钮事件
+        document.getElementById("resetBtn").addEventListener("click",()=>{
+            // 分数归零
+            scores = Array(9).fill(0);
+            for(let i=0;i<9;i++){
+                document.getElementById(`score-${i}`).innerText = 0;
+            }
+            // 清除当前模式
+            currentMode = 0;
+            modeText.innerText = "当前模式：未选择";
+            // 清除所有高亮
+            Object.values(buttons).forEach(btn=>btn.classList.remove("active"));
+        });
+
+    </script>
 </body>
 </html>
+```
